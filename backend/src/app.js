@@ -25,14 +25,16 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Routes
+// Routes (Mount at both /api and / for Vercel multi-service support)
 app.use("/api", userRoutes);
 app.use("/api", progressRoutes);
+app.use("/", userRoutes);
+app.use("/", progressRoutes);
 
 // Root route
 app.get("/", (req, res) => {
   res.json({ 
-    message: "MVC Backend API is running!",
+    message: "DataStram-Pro Backend API is running!",
     endpoints: {
       health: "/api/health",
       generateUsers: "POST /api/generate-users",
