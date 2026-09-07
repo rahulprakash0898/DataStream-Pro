@@ -34,17 +34,24 @@ export const getMongooseInstance = () => mongoose;
 export const getDatabaseStats = async () => {
   try {
     const totalUsers = await User.estimatedDocumentCount();
-    const databaseName = mongoose.connection.db.databaseName;
-    const collections = await mongoose.connection.db.listCollections().toArray();
+    const db = mongoose.connection.db;
+    const databaseName = db ? db.databaseName : "Progress-Bar";
+    const collections = db ? await db.listCollections().toArray() : [];
     
     return {
       database: databaseName,
-      totalUsers: totalUsers.toLocaleString(),
+      totalUsers: (totalUsers || 0).toLocaleString(),
       collections: collections.map(col => col.name),
-      status: "connected"
+      status: mongoose.connection.readyState === 1 ? "connected" : "connecting"
     };
   } catch (error) {
-    throw new Error(error.message);
+    console.error("Error in getDatabaseStats:", error);
+    return {
+      database: "Progress-Bar",
+      totalUsers: "0",
+      collections: [],
+      status: "disconnected: " + error.message
+    };
   }
 };
 

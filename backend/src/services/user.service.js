@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/User.model.js";
 import { generateRandomUser } from "../utils/fakerGenerator.js";
 import { setProgress, deleteProgress } from "./progress.service.js";
@@ -191,20 +192,23 @@ export const downloadUsersService = async (res, downloadId, startTime) => {
 
 export const getHealthStatus = async () => {
   try {
-    // Remove the dynamic import - use the mongoose instance that's already connected
-    const mongoose = (await import('mongoose')).default;
-    const totalUsers = await User.estimatedDocumentCount();
+    let totalUsers = 0;
+    try {
+      totalUsers = await User.estimatedDocumentCount();
+    } catch (e) {
+      console.warn("Could not count documents:", e.message);
+    }
     
     const dbStatus = mongoose.connection.readyState === 1 ? "Connected" : "Disconnected";
     
     return { 
       status: "OK", 
       database: dbStatus,
-      totalUsers: totalUsers.toLocaleString(),
+      totalUsers: (totalUsers || 0).toLocaleString(),
       mongoose: mongoose.version 
     };
   } catch (error) {
     console.error("Health check error:", error);
-    throw new Error(error.message);
+    return { status: "Error", error: error.message };
   }
 };
