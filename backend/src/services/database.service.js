@@ -9,6 +9,10 @@ export const connectDB = async () => {
     return;
   }
 
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI environment variable is missing in environment settings.");
+  }
+
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       dbName: "testdb",

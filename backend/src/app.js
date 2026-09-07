@@ -3,11 +3,27 @@ import cors from "cors";
 import userRoutes from "./routes/user.route.js";
 import progressRoutes from "./routes/progress.route.js";
 
+import { connectDB } from "./services/database.service.js";
+
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Auto-connect DB middleware for serverless/Vercel
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("DB connection middleware failed:", error);
+    res.status(500).json({ 
+      error: "Database connection failed. Please check MONGO_URI and MongoDB Atlas Network Access.",
+      details: error.message 
+    });
+  }
+});
 
 // Routes
 app.use("/api", userRoutes);
