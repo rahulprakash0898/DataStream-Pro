@@ -1,0 +1,20 @@
+{
+  "name": "datastream-pro",
+  "version": "1.0.0",
+  "description": "High-Performance Bulk Data Generator & Memory-Efficient Stream Exporter",
+  "type": "module",
+  "main": "api/index.js",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.3",
+    "zlib": "^1.0.5"
+  }
+}

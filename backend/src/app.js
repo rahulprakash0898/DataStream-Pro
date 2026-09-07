@@ -1,0 +1,42 @@
+import express from "express";
+import cors from "cors";
+import userRoutes from "./routes/user.route.js";
+import progressRoutes from "./routes/progress.route.js";
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use("/api", userRoutes);
+app.use("/api", progressRoutes);
+
+// Root route
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "MVC Backend API is running!",
+    endpoints: {
+      health: "/api/health",
+      generateUsers: "POST /api/generate-users",
+      downloadJSON: "GET /api/download-json",
+      databaseStats: "GET /api/database-stats",
+      progress: "GET /api/download-progress/:id",
+      clearUsers: "DELETE /api/clear-users"
+    }
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error("Unhandled error:", error);
+  res.status(500).json({ error: "Internal server error" });
+});
+
+export default app;
