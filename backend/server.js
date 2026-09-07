@@ -6,27 +6,21 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-// Start server
-const startServer = async () => {
-  try {
-    await connectDB();
-    
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-      console.log(`📈 Database stats: http://localhost:${PORT}/api/database-stats`);
-    });
+// Connect DB if MONGO_URI is set
+if (process.env.MONGO_URI) {
+  connectDB().catch((err) => {
+    console.error("Failed to connect MongoDB on server startup:", err.message);
+  });
+}
 
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
-};
+// Only listen when running standalone locally (Vercel manages port dynamically)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`📈 Database stats: http://localhost:${PORT}/api/database-stats`);
+  });
+}
 
-// Basic shutdown handler (optional)
-process.on('SIGINT', () => {
-  console.log('\n🛑 Server shutting down...');
-  process.exit(0);
-});
-
-startServer();
+// Export Express app for Vercel Serverless Function handler
+export default app;
